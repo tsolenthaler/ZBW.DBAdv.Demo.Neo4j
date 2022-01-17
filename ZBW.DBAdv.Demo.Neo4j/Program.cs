@@ -12,7 +12,7 @@ namespace dotnet
         {
             await CreateMoviewithPerson();
             await ReturnPersonList();
-            await FindMoive();
+            await FindMovie();
             await UpdatePerson();
             //await Remove();
         }
@@ -73,7 +73,7 @@ namespace dotnet
 
         // Find
         // https://neo4j.com/docs/cypher-manual/current/clauses/match/#get-all-nodes-with-label
-        public static async Task FindMoive()
+        public static async Task FindMovie()
         {
             var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("zbw", "zbw"));
             var cypherQuery = @"MATCH (ZbwMovie {title: 'ZbW Movie'}) RETURN ZbwMovie.title";
