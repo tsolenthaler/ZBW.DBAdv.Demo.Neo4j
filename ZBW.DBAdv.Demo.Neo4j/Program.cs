@@ -15,11 +15,11 @@ namespace dotnet
             await FindMoive();
             await UpdatePerson();
             //await Remove();
-
         }
 
-        // Create a person node
+        // Create Node and Relationshipts
         // https://neo4j.com/docs/cypher-manual/current/clauses/create/#create-create-a-node-with-a-label
+        // https://neo4j.com/docs/cypher-manual/current/clauses/create/#create-relationships
         public static async Task CreateMoviewithPerson()
         {
             var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("zbw", "zbw"));
@@ -29,11 +29,15 @@ namespace dotnet
                     CREATE (Angelo:Person {name:'Angelo Lütolf', born:1967})
                     CREATE (Corina:Person {name:'Corina Widmer', born:1961})
                     CREATE (Thomas:Person {name:'Thomas Solenthaler', born:1961})
+                    CREATE (WorkgroupZbW:Group {name:'Arbeitsgruppe ZbW', found:2021-01-01})
                     CREATE
                     (Kehl)-[:ACTED_IN {roles:['Leher']}]->(ZbwMovie),
                     (Angelo)-[:ACTED_IN {roles:['Schüler 1']}]->(ZbwMovie),
                     (Corina)-[:ACTED_IN {roles:['Schüler 2']}]->(ZbwMovie),
-                    (Thomas)-[:DIRECTED]->(ZbwMovie)";
+                    (Thomas)-[:DIRECTED]->(ZbwMovie),
+                    (Angelo)-[:IN_GROUP]->(WorkgroupZbW),
+                    (Corina)-[:IN_GROUP]->(WorkgroupZbW),
+                    (Thomas)-[:IN_GROUP]->(WorkgroupZbW)";
 
             var session = driver.AsyncSession(o => o.WithDatabase("neo4j"));
             var result = await session.WriteTransactionAsync(async tx =>
@@ -111,7 +115,8 @@ namespace dotnet
             var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("zbw", "zbw"));
 
             //var cypherQuery = @"MATCH (n:Person {name: 'Thomas Solenthaler'}) DETACH DELETE n"; // Löscht Node mit allen Relationships
-            var cypherQuery = @"MATCH (n:Movie {title: 'ZbW Movie'}) DETACH DELETE n"; 
+            var cypherQuery = @"MATCH (n:Movie {title: 'ZbW Movie'}) DETACH DELETE n";
+            //var cypherQuery = @"MATCH (n:Group {name: 'Arbeitsgruppe ZbW'}) DETACH DELETE n";
 
             var session = driver.AsyncSession(o => o.WithDatabase("neo4j"));
             var result = await session.WriteTransactionAsync(async tx =>
