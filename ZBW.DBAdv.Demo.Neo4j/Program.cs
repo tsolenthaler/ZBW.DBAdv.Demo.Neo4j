@@ -8,6 +8,8 @@ namespace dotnet
 {
     class Example
     {
+        // Example No-async with IDisposable
+        // https://neo4j.com/developer/dotnet/#dotnet-driver
         public static async Task Main()
         {
             await CreateMoviewithPerson();
@@ -64,7 +66,6 @@ namespace dotnet
                 return await r.ToListAsync();
             });
 
-            // Query
             await session?.CloseAsync();
             foreach (var row in result)
                 Console.WriteLine(row["people.name"]);
@@ -85,7 +86,6 @@ namespace dotnet
                 return await r.ToListAsync();
             });
 
-            // Query
             await session?.CloseAsync();
             foreach (var row in result)
                 Console.WriteLine(row["ZbwMovie.title"]);
