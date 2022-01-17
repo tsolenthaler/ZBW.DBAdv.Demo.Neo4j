@@ -9,7 +9,7 @@ namespace dotnet
     class Example
     {
         // Example No-async with IDisposable
-        // https://neo4j.com/developer/dotnet/#dotnet-driver
+        // https://neo4j.com/docs/dotnet-manual/current/get-started/#dotnet-driver-get-started-hello-world-example
         public static async Task Main()
         {
             await CreateMoviewithPerson();
@@ -69,7 +69,7 @@ namespace dotnet
             await session?.CloseAsync();
             foreach (var row in result)
                 Console.WriteLine(row["people.name"]);
-            //Console.WriteLine(row["Person"].As<string>());
+                //Console.WriteLine(row["Person"].As<string>());
         }
 
         // Find
