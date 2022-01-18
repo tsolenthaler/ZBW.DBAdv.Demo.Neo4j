@@ -12,17 +12,17 @@ namespace dotnet
         // https://neo4j.com/docs/dotnet-manual/current/get-started/#dotnet-driver-get-started-hello-world-example
         public static async Task Main()
         {
-            await CreateMoviewithPerson();
-            await ReturnPersonList();
-            await FindMovie();
-            await UpdatePerson();
+            await Create();
+            await Find();
+            await FindRelationship();
+            await Update();
             //await Remove();
         }
 
         // Create Node and Relationshipts
         // https://neo4j.com/docs/cypher-manual/current/clauses/create/#create-create-a-node-with-a-label
         // https://neo4j.com/docs/cypher-manual/current/clauses/create/#create-relationships
-        public static async Task CreateMoviewithPerson()
+        public static async Task Create()
         {
             var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("zbw", "zbw"));
 
@@ -48,12 +48,12 @@ namespace dotnet
                 return await r.ToListAsync();
             });
 
-            Console.WriteLine("Create Movie");
+            Console.WriteLine("CREATE");
         }
 
         // Find 10 People
         // https://neo4j.com/docs/cypher-manual/current/clauses/match/#get-all-nodes-with-label
-        public static async Task ReturnPersonList()
+        public static async Task Find()
         {
             var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("zbw", "zbw"));
 
@@ -67,17 +67,19 @@ namespace dotnet
             });
 
             await session?.CloseAsync();
+            Console.WriteLine("FIND NODE");
             foreach (var row in result)
                 Console.WriteLine(row["people.name"]);
-                //Console.WriteLine(row["Person"].As<string>());
+            //Console.WriteLine(row["Person"].As<string>());
         }
 
-        // Find
-        // https://neo4j.com/docs/cypher-manual/current/clauses/match/#get-all-nodes-with-label
-        public static async Task FindMovie()
+        // Find Relationship Type
+        // https://neo4j.com/docs/cypher-manual/current/clauses/match/#match-on-rel-type
+        public static async Task FindRelationship()
         {
             var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("zbw", "zbw"));
-            var cypherQuery = @"MATCH (ZbwMovie {title: 'ZbW Movie'}) RETURN ZbwMovie.title";
+            //var cypherQuery = @"MATCH (ZbwMovie {title: 'ZbW Movie'}) RETURN ZbwMovie.title";
+            var cypherQuery = @"MATCH (WorkgroupZbW {name: 'Arbeitsgruppe ZbW'})<-[:IN_GROUP]-(groupmember) RETURN groupmember.name";
 
             var session = driver.AsyncSession(o => o.WithDatabase("neo4j"));
             var result = await session.ReadTransactionAsync(async tx =>
@@ -87,13 +89,14 @@ namespace dotnet
             });
 
             await session?.CloseAsync();
+            Console.WriteLine("FINDE RELATIONSHIP");
             foreach (var row in result)
-                Console.WriteLine(row["ZbwMovie.title"]);
+                Console.WriteLine(row["groupmember.name"]);
         }
 
         // Update / SET
         // https://neo4j.com/docs/cypher-manual/current/clauses/set/
-        public static async Task UpdatePerson()
+        public static async Task Update()
         {
             var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("zbw", "zbw"));
             var cypherQuery = @"MATCH (tom {name: 'Thomas Solenthaler'}) SET tom.children = 3 RETURN tom";
@@ -105,7 +108,9 @@ namespace dotnet
                 var r = await tx.RunAsync(cypherQuery);
                 return await r.ToListAsync();
             });
-            Console.WriteLine("Person Update");
+
+            await session?.CloseAsync();
+            Console.WriteLine("UPDATE");
         }
 
         // Remove
@@ -115,8 +120,8 @@ namespace dotnet
             var driver = GraphDatabase.Driver("bolt://localhost:7687", AuthTokens.Basic("zbw", "zbw"));
 
             //var cypherQuery = @"MATCH (n:Person {name: 'Thomas Solenthaler'}) DETACH DELETE n"; // Löscht Node mit allen Relationships
-            var cypherQuery = @"MATCH (n:Movie {title: 'ZbW Movie'}) DETACH DELETE n";
-            //var cypherQuery = @"MATCH (n:Group {name: 'Arbeitsgruppe ZbW'}) DETACH DELETE n";
+            //var cypherQuery = @"MATCH (n:Movie {title: 'ZbW Movie'}) DETACH DELETE n";
+            var cypherQuery = @"MATCH (n:Group {name: 'Arbeitsgruppe ZbW'}) DETACH DELETE n";
 
             var session = driver.AsyncSession(o => o.WithDatabase("neo4j"));
             var result = await session.WriteTransactionAsync(async tx =>
@@ -125,7 +130,8 @@ namespace dotnet
                 return await r.ToListAsync();
             });
 
-            Console.WriteLine("Movie Deleted");
+            await session?.CloseAsync();
+            Console.WriteLine("REMOVED");
         }
     }
 }
